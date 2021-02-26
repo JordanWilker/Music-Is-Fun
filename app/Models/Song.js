@@ -36,7 +36,7 @@ export default class Song {
         <p>$${this.price}</p>
         <audio controls>
           <source src="${this.preview}" type="audio/mp4">
-         </audio>
+         </audio> 
     </div>
 </div>
     
