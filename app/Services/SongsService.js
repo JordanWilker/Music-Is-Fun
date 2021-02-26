@@ -3,6 +3,11 @@ import Song from "../Models/Song.js";
 import { sandBoxApi } from "./AxiosService.js";
 
 class SongsService {
+
+  constructor(e){
+    //this.getMusicByQuery(e)
+    this.getMySongs()
+  }
   /**
    * Takes in a search query and retrieves the results that will be put in the store
    * @param {string} query
@@ -14,6 +19,7 @@ class SongsService {
     $.getJSON(url)
       .then(res => {
         ProxyState.songs = res.results.map(rawData => new Song(rawData));
+       // console.log(ProxyState.songs);
       })
       .catch(err => {
         throw new Error(err);
@@ -24,6 +30,14 @@ class SongsService {
    * Retrieves the saved list of songs from the sandbox
    */
   async getMySongs() {
+    try {
+      let res = await sandBoxApi.get("")
+      //console.log(res);
+      ProxyState.playlist = res.data.map(s=> new Song(s))
+      console.log(ProxyState.playlist)
+    } catch (error) {
+      
+    }
     //TODO What are you going to do with this result
   }
 
@@ -32,9 +46,21 @@ class SongsService {
    * Afterwords it will update the store to reflect saved info
    * @param {string} id
    */
-  addSong(id) {
+  async addSong(id) {
+
     //TODO you only have an id, you will need to find it in the store before you can post it
     //TODO After posting it what should you do?
+    //console.log("service adding song");
+    //console.log(id);
+    //console.log(ProxyState.songs)
+    try {
+      let foundSong = ProxyState.songs.find(f => f.trackId == id)
+      let res = await sandBoxApi.post("",foundSong)
+      this.getMySongs()
+      console.log(ProxyState.playlist);
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   /**
@@ -42,7 +68,16 @@ class SongsService {
    * Afterwords it will update the store to reflect saved info
    * @param {string} id
    */
-  removeSong(id) {
+  async removeSong(id) {
+    try {
+      //let foundSong = ProxyState.songs.find(f => f._id == id)
+      let res = await sandBoxApi.delete(id)
+      this.getMySongs()
+      console.log(ProxyState.playlist);
+      console.log(res);
+    } catch (error) {
+      console.error(error)
+    }
     //TODO Send the id to be deleted from the server then update the store
   }
 }
